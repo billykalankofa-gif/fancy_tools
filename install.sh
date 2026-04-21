@@ -1,46 +1,31 @@
 #!/bin/bash
+set -e # Arrête le script en cas d'erreur [cite: 62]
 
-set -e
+REPO_URL='https://github.com/billykalankofa-gif/fancy_tools.git' 
+SRC_DIR="$HOME/src/fancy_tools" 
 
-REPO_URL="https://github.com/billykalankofa-gif/fancy_tools.git"
-SRC_DIR="$HOME/src/fancy_tools"
-BASHRC="$HOME/.bashrc"
-
-# Fonction utilitaire : ajoute une ligne si absente
+# Fonction utilitaire pour éviter les doublons dans .bashrc 
 add_if_missing() {
-    grep -qxF "$1" "$BASHRC" || echo "$1" >> "$BASHRC"
+    grep -qF "$1" ~/.bashrc || echo "$1" >> ~/.bashrc 
 }
 
-echo "Installation Fancy Tools..."
+echo "Début de l'installation..."
 
-# 1. Sauvegarde de ~/.bashrc avec horodatage
-BACKUP="$HOME/.bashrc.bak.$(date +%Y%m%d_%H%M%S)"
-cp "$BASHRC" "$BACKUP"
-echo "Backup créé : $BACKUP"
+# 1. Sauvegarder .bashrc avec horodatage 
+cp ~/.bashrc ~/.bashrc.bak_$(date +%Y%m%d_%H%M%S)
 
-# 2. Créer ~/src si besoin
-mkdir -p "$HOME/src"
-
-# 3. Cloner le dépôt si absent
+# 2. Cloner le dépôt dans ~/src si absent
 if [ ! -d "$SRC_DIR" ]; then
-    git clone "$REPO_URL" "$SRC_DIR"
-    echo "Dépôt cloné"
-else
-    echo "Dépôt déjà présent"
+    mkdir -p ~/src
+    git clone -b dev "$REPO_URL" "$SRC_DIR"
 fi
 
-# 4. Ajouter ~/bin au PATH (sans doublon)
-add_if_missing 'export PATH="$HOME/bin:$PATH"'
+# 3. Ajouter les configurations dans .bashrc 
+add_if_missing "source $SRC_DIR/.aliases"
+add_if_missing "source $SRC_DIR/fancy_functions.sh"
+add_if_missing "export PATH=\$PATH:\$HOME/bin"
 
-# 5. Sourcer .aliases (sans doublon)
-add_if_missing 'if [ -f "$HOME/src/fancy_tools/.aliases" ]; then'
-add_if_missing '    source "$HOME/src/fancy_tools/.aliases"'
-add_if_missing 'fi'
+# Créer le dossier bin s'il n'existe pas
+mkdir -p ~/bin
 
-# 6. Sourcer fancy_functions.sh (sans doublon)
-add_if_missing 'if [ -f "$HOME/src/fancy_tools/fancy_functions.sh" ]; then'
-add_if_missing '    source "$HOME/src/fancy_tools/fancy_functions.sh"'
-add_if_missing 'fi'
-
-echo "Installation terminée ✔"
-echo "Recharge ton terminal avec : source ~/.bashrc"
+echo "Installation terminée. Relancez votre terminal ou tapez 'source ~/.bashrc'."
