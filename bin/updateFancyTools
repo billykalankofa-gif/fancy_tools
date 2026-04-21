@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Se positionner dans le dépôt [cite: 73]
+cd ~/src/fancy_tools || exit
+
+# Vérifier que l'on est sur la branche main [cite: 74]
+CURRENT_BRANCH=$(git branch --show-current)
+if [ "$CURRENT_BRANCH" != "main" ]; then
+    echo "Erreur : Vous devez être sur la branche main pour mettre à jour."
+    exit 1
+fi
+
+# Récupérer la dernière version [cite: 75]
+git pull origin main
+
+# Copier le script de mise à jour vers ~/bin [cite: 76]
+cp bin/updateFancyTools ~/bin/updateFancyTools
+chmod +x ~/bin/updateFancyTools # Rendre exécutable [cite: 77]
+
+echo "Mise à jour réussie !"
