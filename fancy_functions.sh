@@ -1,22 +1,23 @@
+#!/bin/bash
+
+# Fonction gco : simplifie le commit avec le nom de la branche [cite: 42]
 gco() {
-    # Vérifie que le message est fourni
-    if [ $# -eq 0 ]; then
-        echo "Usage : gco 'message du commit'"
+    # Vérifier que l'utilisateur a fourni un message [cite: 50]
+    if [ -z "$1" ]; then
+        echo "Usage: gco 'votre message de commit'"
         return 1
     fi
 
-    # Vérifie que c'est un dépôt Git
-    if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-        echo "Erreur : vous n'êtes pas dans un dépôt Git."
+    # Vérifier que le répertoire est un dépôt Git [cite: 45]
+    if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        echo "Erreur : Ce répertoire n'est pas un dépôt Git."
         return 1
     fi
 
-    # Récupère le nom de la branche
-    branche=$(git branch --show-current)
+    # Récupérer le nom de la branche courante [cite: 46]
+    local branch_name=$(git branch --show-current)
 
-    # Formate le message
-    message="[$branche] $*"
-
-    # Commit
-    git commit -m "$message"
+    # Formater le message et effectuer le commit [cite: 46, 49]
+    local full_message="[$branch_name] $1"
+    git commit -m "$full_message"
 }
